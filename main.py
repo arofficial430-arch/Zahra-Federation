@@ -116,4 +116,4 @@ async def info_command(client, message: Message):
 # ==============================
 
 if __name__ == "__main__":
-    logger.info("Starting
+    logger.info("Starting Zahra Federation...")
