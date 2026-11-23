@@ -42,11 +42,16 @@ app = Client(
 
 @app.on_message(filters.command("start") & filters.private)
 async def start_command(client, message: Message):
-    await message.reply_text(
-        "✨ Welcome to ZAHRA FEDERATION ✨\n\n"
-        "Advanced Telegram Group Management Bot\n\n"
-        "Use /help to see my commands."
-    )
+    logger.info("START command received")
+    try:
+        await message.reply_text(
+            "✨ Welcome to ZAHRA FEDERATION ✨\n\n"
+            "Advanced Telegram Group Management Bot\n\n"
+            "Use /help to see my commands."
+        )
+        logger.info("START reply sent successfully")
+    except Exception:
+        logger.exception("START reply failed")
 
 # ==============================
 # HELP COMMAND
