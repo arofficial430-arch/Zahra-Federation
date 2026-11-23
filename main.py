@@ -2,6 +2,8 @@ import os
 import logging
 import asyncio
 from aiohttp import web
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 from pyrogram import Client, filters, idle
 from pyrogram.types import Message
 
