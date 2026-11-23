@@ -1,6 +1,8 @@
 import os
 import logging
-from pyrogram import Client, filters
+import asyncio
+from aiohttp import web
+from pyrogram import Client, filters, idle
 from pyrogram.types import Message
 
 # ==============================
@@ -115,6 +117,32 @@ async def info_command(client, message: Message):
 # STARTUP
 # ==============================
 
-if __name__ == "__main__":
+async def health(request):
+    return web.Response(text="Zahra Federation is running!")
+
+async def main():
     logger.info("Starting Zahra Federation...")
-    app.run()
+
+    await app.start()
+
+    web_app = web.Application()
+    web_app.router.add_get("/", health)
+    web_app.router.add_get("/health", health)
+
+    runner = web.AppRunner(web_app)
+    await runner.setup()
+
+    port = int(os.environ.get("PORT", "10000"))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+
+    logger.info(f"HTTP server running on port {port}")
+
+    try:
+        await idle()
+    finally:
+        await runner.cleanup()
+        await app.stop()
+
+if __name__ == "__main__":
+    asyncio.run(main())
