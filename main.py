@@ -70,6 +70,14 @@ async def help_command(client, message: Message):
         "/info - Bot information"
     )
 
+@app.on_message(filters.command("newfed") & filters.group)
+async def newfed_command(client, message: Message):
+    await message.reply_text(
+        "💜 ZAHRA FEDERATION\n\n"
+        "Federation creation system is ready!\n"
+        "Next: Federation name setup."
+    )
+    
 # ==============================
 # PING COMMAND
 # ==============================
