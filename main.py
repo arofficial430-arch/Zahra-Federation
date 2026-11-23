@@ -1,6 +1,7 @@
 import os
 import logging
 import asyncio
+from Zahra.database import create_federation
 from aiohttp import web
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
