@@ -1,13 +1,13 @@
 import os
 import logging
 import asyncio
-from Zahra.database import create_federation
+from Zahra.database import create_federation, connect_database
 from aiohttp import web
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 from pyrogram import Client, filters, idle
 from pyrogram.types import Message
-
+from pyrogram.enums import ChatMemberStatus
 # ==============================
 # ZAHRA FEDERATION CONFIG
 # ==============================
@@ -73,11 +73,53 @@ async def help_command(client, message: Message):
 
 @app.on_message(filters.command("newfed") & filters.group)
 async def newfed_command(client, message: Message):
-    await message.reply_text(
-        "💜 ZAHRA FEDERATION\n\n"
-        "Federation creation system is ready!\n"
-        "Next: Federation name setup."
+    if not message.from_user:
+        return
+
+    member = await client.get_chat_member(
+        message.chat.id,
+        message.from_user.id
     )
+
+    if member.status not in (
+        ChatMemberStatus.OWNER,
+        ChatMemberStatus.ADMINISTRATOR
+    ):
+        return await message.reply_text(
+            "⛔ Group admins only!"
+        )
+
+    name = " ".join(message.command[1:]).strip()
+
+    if not name:
+        return await message.reply_text(
+            "💜 Federation name கொடு!\n\n"
+            "Example: /newfed Zahra Family"
+        )
+
+    try:
+        result = await create_federation(
+            name,
+            message.from_user.id,
+            message.chat.id
+        )
+
+        if result is None:
+            return await message.reply_text(
+                "⚠️ இந்த group-க்கு ஏற்கனவே Federation இருக்கு!"
+            )
+
+        await message.reply_text(
+            f"🎉 Federation Created Successfully!\n\n"
+            f"💜 Name: {name}\n"
+            f"🆔 ID: `{result}`"
+        )
+
+    except Exception:
+        logger.exception("Federation creation failed")
+        await message.reply_text(
+            "❌ Federation create செய்ய முடியவில்லை. Try again later!"
+        )
     
 # ==============================
 # PING COMMAND
@@ -138,7 +180,8 @@ async def health(request):
 
 async def main():
     logger.info("Starting Zahra Federation...")
-
+    
+    await connect_database()
     await app.start()
 
     web_app = web.Application()
