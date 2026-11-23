@@ -56,4 +56,25 @@ async def clear_warnings(user_id, chat_id):
         "user_id": user_id,
         "chat_id": chat_id
     })
+async def create_federation(name, owner_id, chat_id):
+    collection = await get_collection("federations")
 
+    existing = await collection.find_one({"chat_id": chat_id})
+
+    if existing:
+        return None
+
+    result = await collection.insert_one({
+        "name": name,
+        "owner_id": owner_id,
+        "chat_id": chat_id,
+        "created": True
+    })
+
+    return result.inserted_id
+
+
+async def get_federation(chat_id):
+    collection = await get_collection("federations")
+
+    return await collection.find_one({"chat_id": chat_id})
