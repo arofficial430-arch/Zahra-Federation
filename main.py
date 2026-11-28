@@ -2,6 +2,7 @@ import os
 import logging
 import asyncio
 from Zahra.database import create_federation, connect_database
+from Zahra.database import get_federation
 from aiohttp import web
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
@@ -120,7 +121,29 @@ async def newfed_command(client, message: Message):
         await message.reply_text(
             "❌ Federation create செய்ய முடியவில்லை. Try again later!"
         )
-    
+
+    @app.on_message(filters.command("fedinfo") & filters.group)
+async def fedinfo_command(client, message: Message):
+    try:
+        federation = await get_federation(message.chat.id)
+
+        if not federation:
+            return await message.reply_text(
+                "❌ இந்த group எந்த Federation-லயும் இல்லை!"
+            )
+
+        await message.reply_text(
+            f"💜 **Federation Information**\n\n"
+            f"🏷️ Name: {federation['name']}\n"
+            f"🆔 ID: `{federation['_id']}`\n"
+            f"👑 Owner ID: `{federation['owner_id']}`"
+        )
+
+    except Exception:
+        logger.exception("Federation info failed")
+        await message.reply_text(
+            "❌ Federation info எடுக்க முடியவில்லை!"
+        )
 # ==============================
 # PING COMMAND
 # ==============================
