@@ -6,6 +6,7 @@ from Zahra.database import (
     add_fed_admin,
     remove_fed_admin,
     get_fed_admins,
+    is_fed_admin,
     add_fed_ban,
     remove_fed_ban,
     get_fed_bans,
