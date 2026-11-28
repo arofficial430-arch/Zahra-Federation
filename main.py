@@ -222,7 +222,66 @@ async def fedadmin_command(client, message: Message):
         await message.reply_text(
             "❌ Admin add செய்ய முடியவில்லை!"
         )
+        
+@app.on_message(filters.command("joinfed") & filters.group)
+async def joinfed_command(client, message: Message):
+    if not message.from_user:
+        return
 
+    if len(message.command) < 2:
+        return await message.reply_text(
+            "Usage: /joinfed FED_ID"
+        )
+
+    try:
+        member = await client.get_chat_member(
+            message.chat.id,
+            message.from_user.id
+        )
+
+        if member.status not in [
+            ChatMemberStatus.OWNER,
+            ChatMemberStatus.ADMINISTRATOR
+        ]:
+            return await message.reply_text(
+                "⛔ Group Admin மட்டும் தான் இதைச் செய்ய முடியும்!"
+            )
+
+        fed_id = ObjectId(message.command[1])
+        federation = await get_fed_details(fed_id)
+
+        if not federation:
+            return await message.reply_text(
+                "❌ Federation கிடைக்கவில்லை!"
+            )
+
+        is_owner = message.from_user.id == federation["owner_id"]
+        is_admin = await is_fed_admin(
+            federation["_id"],
+            message.from_user.id
+        )
+
+        if not (is_owner or is_admin):
+            return await message.reply_text(
+                "⛔ Federation Owner/Admin மட்டும் தான் இதைச் செய்ய முடியும்!"
+            )
+
+        await connect_fed_chat(
+            federation["_id"],
+            message.chat.id
+        )
+
+        await message.reply_text(
+            f"💜 **Group Successfully Connected!**\n\n"
+            f"🏷️ Federation: {federation['name']}\n"
+            f"🆔 ID: `{federation['_id']}`"
+        )
+
+    except Exception:
+        logger.exception("Join federation failed")
+        await message.reply_text(
+            "❌ Federation join செய்ய முடியவில்லை!"
+        )
 # ==============================
 # PING COMMAND
 # ==============================
