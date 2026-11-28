@@ -1,6 +1,7 @@
 import os
 import logging
 import asyncio
+from bson import ObjectId
 from Zahra.database import create_federation, connect_database
 from Zahra.database import (
     add_fed_admin,
