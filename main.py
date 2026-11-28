@@ -148,18 +148,29 @@ async def fedinfo_command(client, message: Message):
                 "❌ இந்த group எந்த Federation-லயும் இல்லை!"
             )
 
+        fed_id = federation["_id"]
+
+        admins = await get_fed_admins(fed_id)
+        bans = await get_fed_bans(fed_id)
+        chats = await get_fed_chats(fed_id)
+        subscriptions = await get_fed_subscriptions(fed_id)
+
         await message.reply_text(
             f"💜 **Federation Information**\n\n"
             f"🏷️ Name: {federation['name']}\n"
-            f"🆔 ID: `{federation['_id']}`\n"
-            f"👑 Owner ID: `{federation['owner_id']}`"
+            f"🆔 ID: `{fed_id}`\n"
+            f"👑 Owner ID: `{federation['owner_id']}`\n\n"
+            f"🛡️ Admins: `{admins}`\n"
+            f"🚫 Bans: `{bans}`\n"
+            f"👥 Connected Groups: `{chats}`\n"
+            f"🔗 Subscribed Feds: `{subscriptions}`"
         )
 
     except Exception:
         logger.exception("Federation info failed")
         await message.reply_text(
             "❌ Federation info எடுக்க முடியவில்லை!"
-        )
+    )
         
 @app.on_message(filters.command("fedadmin") & filters.group)
 async def fedadmin_command(client, message: Message):
