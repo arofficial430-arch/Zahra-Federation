@@ -166,11 +166,24 @@ async def fedadmin_command(client, message: Message):
         return
 
     federation = await get_federation(message.chat.id)
+    
 
     if not federation:
         return await message.reply_text(
             "❌ இந்த group Federation-ல் இல்லை!"
         )
+
+    is_owner = message.from_user.id == federation["owner_id"]
+    is_admin = await is_fed_admin(
+        federation["_id"],
+        message.from_user.id
+    )
+
+    if not (is_owner or is_admin):
+        return await message.reply_text(
+            "⛔ Federation Owner/Admin மட்டும் தான் இதைச் செய்ய முடியும்!"
+        )
+        
 
     if len(message.command) < 2 or message.command[1].lower() != "add":
         return await message.reply_text(
