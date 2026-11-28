@@ -1,5 +1,6 @@
 
 import os
+from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
@@ -77,7 +78,30 @@ async def create_federation(name, owner_id, chat_id):
 async def get_federation(chat_id):
     collection = await get_collection("federations")
 
-    return await collection.find_one({"chat_id": chat_id})
+    federation = await collection.find_one({
+        "chat_id": chat_id
+    })
+
+    if federation:
+        return federation
+
+    chats = await get_collection("fed_chats")
+
+    connected = await chats.find_one({
+        "chat_id": chat_id
+    })
+
+    if not connected:
+        return None
+
+    try:
+        fed_id = ObjectId(connected["fed_id"])
+    except Exception:
+        return None
+
+    return await collection.find_one({
+        "_id": fed_id
+    })
     
 # ==============================
 # ZAHRA FEDERATION DATABASE
