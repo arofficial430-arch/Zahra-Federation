@@ -121,8 +121,7 @@ async def newfed_command(client, message: Message):
         await message.reply_text(
             "❌ Federation create செய்ய முடியவில்லை. Try again later!"
         )
-
-    @app.on_message(filters.command("fedinfo") & filters.group)
+@app.on_message(filters.command("fedinfo") & filters.group)
 async def fedinfo_command(client, message: Message):
     try:
         federation = await get_federation(message.chat.id)
