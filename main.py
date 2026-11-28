@@ -158,6 +158,57 @@ async def fedinfo_command(client, message: Message):
         await message.reply_text(
             "❌ Federation info எடுக்க முடியவில்லை!"
         )
+        
+@app.on_message(filters.command("fedadmin") & filters.group)
+async def fedadmin_command(client, message: Message):
+    if not message.from_user:
+        return
+
+    federation = await get_federation(message.chat.id)
+
+    if not federation:
+        return await message.reply_text(
+            "❌ இந்த group Federation-ல் இல்லை!"
+        )
+
+    if len(message.command) < 2 or message.command[1].lower() != "add":
+        return await message.reply_text(
+            "Usage: /fedadmin add (reply to user)"
+        )
+
+    if not message.reply_to_message:
+        return await message.reply_text(
+            "⚠️ ஒரு user message-க்கு reply செய்து /fedadmin add அனுப்பு!"
+        )
+
+    user = message.reply_to_message.from_user
+
+    if not user:
+        return await message.reply_text("❌ User கிடைக்கவில்லை!")
+
+    if user.id == federation["owner_id"]:
+        return await message.reply_text(
+            "👑 Federation Owner ஏற்கனவே Owner தான்!"
+        )
+
+    try:
+        await add_fed_admin(
+            federation["_id"],
+            user.id
+        )
+
+        await message.reply_text(
+            f"🛡️ Federation Admin Added!\n\n"
+            f"👤 User: {user.mention}\n"
+            f"🆔 ID: `{user.id}`"
+        )
+
+    except Exception:
+        logger.exception("Fed admin add failed")
+        await message.reply_text(
+            "❌ Admin add செய்ய முடியவில்லை!"
+        )
+
 # ==============================
 # PING COMMAND
 # ==============================
