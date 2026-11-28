@@ -78,3 +78,122 @@ async def get_federation(chat_id):
     collection = await get_collection("federations")
 
     return await collection.find_one({"chat_id": chat_id})
+    
+# ==============================
+# ZAHRA FEDERATION DATABASE
+# ==============================
+
+async def add_fed_admin(fed_id, user_id):
+    collection = await get_collection("fed_admins")
+    return await collection.update_one(
+        {"fed_id": str(fed_id), "user_id": user_id},
+        {"$set": {"fed_id": str(fed_id), "user_id": user_id}},
+        upsert=True
+    )
+
+
+async def remove_fed_admin(fed_id, user_id):
+    collection = await get_collection("fed_admins")
+    return await collection.delete_one({
+        "fed_id": str(fed_id),
+        "user_id": user_id
+    })
+
+
+async def get_fed_admins(fed_id):
+    collection = await get_collection("fed_admins")
+    return await collection.count_documents({
+        "fed_id": str(fed_id)
+    })
+
+
+async def add_fed_ban(fed_id, user_id, reason="No reason"):
+    collection = await get_collection("fed_bans")
+    return await collection.update_one(
+        {"fed_id": str(fed_id), "user_id": user_id},
+        {"$set": {
+            "fed_id": str(fed_id),
+            "user_id": user_id,
+            "reason": reason
+        }},
+        upsert=True
+    )
+
+
+async def remove_fed_ban(fed_id, user_id):
+    collection = await get_collection("fed_bans")
+    return await collection.delete_one({
+        "fed_id": str(fed_id),
+        "user_id": user_id
+    })
+
+
+async def get_fed_bans(fed_id):
+    collection = await get_collection("fed_bans")
+    return await collection.count_documents({
+        "fed_id": str(fed_id)
+    })
+
+
+async def connect_fed_chat(fed_id, chat_id):
+    collection = await get_collection("fed_chats")
+    return await collection.update_one(
+        {"fed_id": str(fed_id), "chat_id": chat_id},
+        {"$set": {
+            "fed_id": str(fed_id),
+            "chat_id": chat_id
+        }},
+        upsert=True
+    )
+
+
+async def disconnect_fed_chat(fed_id, chat_id):
+    collection = await get_collection("fed_chats")
+    return await collection.delete_one({
+        "fed_id": str(fed_id),
+        "chat_id": chat_id
+    })
+
+
+async def get_fed_chats(fed_id):
+    collection = await get_collection("fed_chats")
+    return await collection.count_documents({
+        "fed_id": str(fed_id)
+    })
+
+
+async def subscribe_fed(fed_id, subscribed_fed_id):
+    collection = await get_collection("fed_subscriptions")
+    return await collection.update_one(
+        {
+            "fed_id": str(fed_id),
+            "subscribed_fed_id": str(subscribed_fed_id)
+        },
+        {"$set": {
+            "fed_id": str(fed_id),
+            "subscribed_fed_id": str(subscribed_fed_id)
+        }},
+        upsert=True
+    )
+
+
+async def unsubscribe_fed(fed_id, subscribed_fed_id):
+    collection = await get_collection("fed_subscriptions")
+    return await collection.delete_one({
+        "fed_id": str(fed_id),
+        "subscribed_fed_id": str(subscribed_fed_id)
+    })
+
+
+async def get_fed_subscriptions(fed_id):
+    collection = await get_collection("fed_subscriptions")
+    return await collection.count_documents({
+        "fed_id": str(fed_id)
+    })
+
+
+async def get_fed_details(fed_id):
+    collection = await get_collection("federations")
+    return await collection.find_one({
+        "_id": fed_id
+    })
