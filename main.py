@@ -2,6 +2,21 @@ import os
 import logging
 import asyncio
 from Zahra.database import create_federation, connect_database
+from Zahra.database import (
+    add_fed_admin,
+    remove_fed_admin,
+    get_fed_admins,
+    add_fed_ban,
+    remove_fed_ban,
+    get_fed_bans,
+    connect_fed_chat,
+    disconnect_fed_chat,
+    get_fed_chats,
+    subscribe_fed,
+    unsubscribe_fed,
+    get_fed_subscriptions,
+    get_fed_details
+)
 from Zahra.database import get_federation
 from aiohttp import web
 loop = asyncio.new_event_loop()
