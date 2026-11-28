@@ -107,6 +107,15 @@ async def get_fed_admins(fed_id):
     })
 
 
+async def is_fed_admin(fed_id, user_id):
+    collection = await get_collection("fed_admins")
+
+    return await collection.find_one({
+        "fed_id": str(fed_id),
+        "user_id": user_id
+    }) is not None
+
+
 async def add_fed_ban(fed_id, user_id, reason="No reason"):
     collection = await get_collection("fed_bans")
     return await collection.update_one(
